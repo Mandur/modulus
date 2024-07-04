@@ -94,3 +94,12 @@ loggers:
     group:
     mode: disabled
     dir: ${output}
+
+  mlflow:
+    _target_: loggers.MlFlowLogger
+    project: car-cfd # aero-graph-net
+    entity: modulus
+    name: agn
+    group:
+    mode: enabled
+    dir: ${output}

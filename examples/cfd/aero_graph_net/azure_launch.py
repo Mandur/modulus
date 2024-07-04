@@ -5,12 +5,19 @@ from azure.identity import DefaultAzureCredential
 
 from examples.cfd.aero_graph_net.settings import Settings
 
-def build_tags(tags:Dict) -> Dict[str, str]:
+def build_tags(settings:Settings) -> Dict[str, str]:
     """Builds the tags for the job."""
+    tags=settings.tags or {}
     return {**tags, **dict({
         "experiment_name": "ahmed_body_v2",
         "experiment_type": "training",
+        "parallel_mode": settings.parallel_mode,
+        "instance_count": settings.instance_count,
+        "experiment": settings.experiment
     })}
+
+def build_name(settings:Settings) -> str:
+    return f"{settings.parallel_mode}_{settings.instance_count}_{settings.experiment}])"
 
 def run_training_job():
     settings=Settings()
@@ -22,11 +29,11 @@ def run_training_job():
     # define the command
     command_job = command(
         code=".",
-        command="python examples/cfd/aero_graph_net/train.py +experiment=ahmed/mgn output=${{outputs.checkpoint_dir}} data.data_dir=${{inputs.data_dir}}",
+        command=f"python examples/cfd/aero_graph_net/train.py +experiment={settings.experiment} output=${{outputs.checkpoint_dir}} data.data_dir=${{inputs.data_dir}}",
         environment=settings.aml_environment,
-        display_name= settings.display_name,
+        display_name= build_name(settings),
         experiment_name="ahmed_body_v2",
-        shm_size="5g",
+        shm_size="15g",
         identity= UserIdentityConfiguration(),
         tags=tags,
         inputs=built_inputs,
@@ -34,7 +41,7 @@ def run_training_job():
             # "DATASET_MOUNT_BLOCK_BASED_CACHE_ENABLED": False, # Enable block-based caching
             # "DATASET_MOUNT_BLOCK_FILE_CACHE_ENABLED": False, # Disable caching on disk
             # "DATASET_MOUNT_MEMORY_CACHE_SIZE": 0, # Disabling in-memory caching
-            "DATASET_MOUNT_BLOCK_BASED_CACHE_ENABLED": False, # disable block-based caching
+            # "DATASET_MOUNT_BLOCK_BASED_CACHE_ENABLED": False, # disable block-based caching
             "HYDRA_FULL_ERROR": 1,
 
             },
@@ -53,6 +60,7 @@ def run_training_job():
                 name="ahmed_output",
             )
         },
+        instance_count= settings.instance_count,
 
         compute=settings.compute_name,
     )
@@ -76,7 +84,7 @@ def create_inputs(settings):
     inputs["data_dir"] = Input(
                 type="uri_folder",
                 path=settings.data_dir,
-                mode = "download"
+                mode = "ro_mount"
             )
     inputs["epochs"] =Input(type="integer", default=(settings.hydra_epochs or 100))
     inputs["checkpoint_save_freq"]= Input(type="integer", default=(settings.hydra_checkpoint_save_freq or 5))

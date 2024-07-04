@@ -180,8 +180,9 @@ class MGNTrainer:
         losses_agg["total"] = sum(losses_agg.values())
 
         # Visualize last batch.
-        for vis in self.visualizers.values():
-            vis(graph, pred_g, gt_g, epoch, elogger)
+        # todo parametrize visualization
+        # for vis in self.visualizers.values():
+        #     vis(graph, pred_g, gt_g, epoch, elogger)
 
         # Log losses.
         num_batches = len(self.validation_dataloader)

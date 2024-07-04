@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     resource_group:str
     workspace:str
     parallel_mode: Optional[str] = None
-
+    instance_count: Optional[int] = Field(1)
     hydra_epochs: Optional[int] = None
     hydra_checkpoint_save_freq: Optional[int] = None
+    experiment: Optional[str] = Field("ahmed/mgn")

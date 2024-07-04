@@ -18,7 +18,8 @@
 from abc import ABC, abstractmethod
 import functools
 import logging
-
+import mlflow
+from mlflow.tracking import MlflowClient
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
@@ -83,6 +84,24 @@ class WandBLogger(ExperimentLogger):
     @rank0
     def log_image(self, tag: str, value, step: int) -> None:
         wandb.log({tag: wandb.Image(value)}, step=step)
+    
+class MlFlowLogger(ExperimentLogger):
+    """Wrapper for mlflow logger."""
+
+    def __init__(self, **kwargs) -> None:
+        if DistributedManager().rank != 0:
+            return
+        
+        mlflow.start_run()
+        mlflow.autolog()
+
+    @rank0
+    def log_scalar(self, tag: str, value: float, step: int) -> None:
+        mlflow.log_metric(tag, value, step=step)
+
+    @rank0
+    def log_image(self, tag: str, value, step: int) -> None:
+        mlflow.log_image(tag, value, step=step)
 
 
 class CompositeLogger(ExperimentLogger):
