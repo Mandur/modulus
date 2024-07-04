@@ -1,0 +1,15 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch training for Ahmed Body",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "examples.cfd.aero_graph_net.azure_launch",
+            "env": { "PYTHONPATH": "${workspaceRoot}"}
+        },
+    ]
+}

@@ -7,8 +7,7 @@ from examples.cfd.aero_graph_net.settings import Settings
 
 def build_tags(settings:Settings) -> Dict[str, str]:
     """Builds the tags for the job."""
-    tags=settings.tags or {}
-    return {**tags, **dict({
+    return {**settings.tags, **dict({
         "experiment_name": "ahmed_body_v2",
         "experiment_type": "training",
         "parallel_mode": settings.parallel_mode,
@@ -17,13 +16,13 @@ def build_tags(settings:Settings) -> Dict[str, str]:
     })}
 
 def build_name(settings:Settings) -> str:
-    return f"{settings.parallel_mode}_{settings.instance_count}_{settings.experiment}])"
+    return f"{settings.parallel_mode}_{settings.instance_count}_{settings.experiment}"
 
 def run_training_job():
     settings=Settings()
 
     ml_client = MLClient(credential=DefaultAzureCredential(), subscription_id= settings.subscription_id, resource_group_name=settings.resource_group, workspace_name= settings.workspace)
-    tags=build_tags(settings.tags)
+    tags=build_tags(settings)
 
     built_inputs=create_inputs(settings)
     # define the command
