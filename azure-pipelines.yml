@@ -16,4 +16,5 @@ jobs:
     inputs:
       scanType: 'LogOnly'
       verbosity: 'Verbose'
+      dockerImagesToScan: 'nvcr.io/nvidia/modulus/modulus:24.09'
       alertWarningLevel: 'Low'
